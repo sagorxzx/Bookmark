@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+<meta name="theme-color" content="#0a0e27">
+<title>Sagar's Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+  
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-dark: #4f46e5;
+    --accent: #22d3ee;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-2: rgba(255, 255, 255, 0.07);
+    --surface-hover: rgba(255, 255, 255, 0.1);
+    --border: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.2);
+    --text-primary: #f8fafc;
+    --text-secondary: rgba(248, 250, 252, 0.65);
+    --text-muted: rgba(248, 250, 252, 0.4);
+    --danger: #f43f5e;
+    --success: #10b981;
+    --warning: #fbbf24;
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.25);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --bg-gradient: radial-gradient(ellipse at top, #1e1b4b 0%, #0a0e27 50%, #050714 100%);
+  }
+  
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html, body { 
+    min-height: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  body {
+    font-family: 'Inter', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 12px;
+    transition: background 0.5s ease, color 0.3s ease;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatGlow 15s ease-in-out infinite;
+  }
+  
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: floatGlow 18s ease-in-out infinite reverse;
+  }
+  
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -30px) scale(1.1); }
+  }
+  
+  body.light-mode {
+    --surface: rgba(255, 255, 255, 0.7);
+    --surface-2: rgba(255, 255, 255, 0.85);
+    --surface-hover: rgba(255, 255, 255, 1);
+    --border: rgba(0, 0, 0, 0.1);
+    --border-strong: rgba(0, 0, 0, 0.18);
+    --text-primary: #0f172a;
+    --text-secondary: rgba(15, 23, 42, 0.65);
+    --text-muted: rgba(15, 23, 42, 0.4);
+    --bg-gradient: radial-gradient(ellipse at top, #e0e7ff 0%, #f1f5f9 50%, #f8fafc 100%);
+  }
+  
+  body.light-mode::before,
+  body.light-mode::after { opacity: 0.4; }
+  
+  /* ============================================
+     APP CONTAINER - Overflow hidden prevents sideways scroll
+     ============================================ */
+  .app-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 24px);
+    overflow: hidden;
+  }
+  
+  /* ============================================
+     HEADER
+     ============================================ */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: var(--surface);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin-bottom: 18px;
+    gap: 12px;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .time-display { display: flex; flex-direction: column; min-width: 0; }
+  
+  #clock {
+    font-size: 1.6em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  #date {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    font-size: 0.95em;
+  }
+  
+  .icon-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+  }
+  
+  .icon-btn:active { transform: scale(0.96); }
+  
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    font-size: 1em;
+  }
+  
+  .theme-toggle:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+  }
+  
+  .theme-toggle:active { transform: scale(0.96); }
+  
+  /* ============================================
+     HERO
+     ============================================ */
+  .hero {
+    text-align: center;
+    padding: 12px 0 6px;
+    margin-bottom: 6px;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .brand-logo {
+    width: 180px;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+  }
+  
+  @media (min-width: 640px) {
+    .brand-logo { width: 220px; }
+  }
+  
+  body.light-mode .brand-logo {
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.08));
+  }
+  
+  .engine-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(20px);
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  
+  .engine-tabs::-webkit-scrollbar { display: none; }
+  
+  .engine-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  
+  .engine-tab:hover { color: var(--text-primary); }
+  
+  .engine-tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+  
+  .search-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 16px 54px 16px 52px;
+    background: var(--surface-2);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    color: var(--text-primary);
+    font-size: 0.95em;
+    font-family: inherit;
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    outline: none;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .search-input::placeholder { color: var(--text-muted); }
+  
+  .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), var(--shadow-lg);
+    background: var(--surface-hover);
+  }
+  
+  .search-icon-left {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.95em;
+    pointer-events: none;
+    transition: color 0.25s ease;
+  }
+  
+  .search-wrapper:focus-within .search-icon-left { color: var(--primary); }
+  
+  .search-clear {
+    position: absolute;
+    right: 58px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 0.85em;
+  }
+  
+  .search-clear.visible { display: flex; }
+  .search-clear:hover { background: var(--surface-hover); color: var(--danger); }
+  
+  .search-submit {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 44px;
+    border: none;
+    border-radius: 100px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95em;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  }
+  
+  .search-submit:hover { transform: scale(1.05); }
+  .search-submit:active { transform: scale(0.95); }
+  
+  /* ============================================
+     SHORTCUTS SECTION - Fixed width, no overflow
+     ============================================ */
+  .shortcuts-section {
+    flex: 1;
+    margin-top: 22px;
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding: 0 2px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92em;
+    font-weight: 600;
+  }
+  
+  .section-title-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8em;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+  
+  .section-count {
+    font-size: 0.68em;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+  }
+  
+  .fav-filter-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: 500;
+    font-family: inherit;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .fav-filter-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+  }
+  
+  .fav-filter-btn.active {
+    background: linear-gradient(135deg, var(--warning), #f59e0b);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+  }
+  
+  /* Category tabs */
+  .category-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 0 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-width: 100%;
+  }
+  
+  .category-tabs::-webkit-scrollbar { display: none; }
+  
+  .cat-tab {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: 500;
+    transition: var(--transition);
+    white-space: nowrap;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  
+  .cat-tab:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+  
+  .cat-tab.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+  
+  .cat-tab .count {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1px 6px;
+    border-radius: 100px;
+    font-size: 0.85em;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+  }
+  
+  .cat-tab.active .count { background: rgba(255, 255, 255, 0.25); }
+  
+  /* ============================================
+     SHORTCUTS GRID - Always 5 columns, no overflow
+     ============================================ */
+  .shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    padding: 0;
+    margin-bottom: 18px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  @media (min-width: 480px) {
+    .shortcuts-grid { gap: 8px; }
+  }
+  
+  @media (min-width: 640px) {
+    .shortcuts-grid { gap: 12px; }
+  }
+  
+  @media (min-width: 900px) {
+    .shortcuts-grid { gap: 14px; }
+  }
+  
+  /* ============================================
+     SHORTCUT CARD
+     ============================================ */
+  .shortcut-card {
+    position: relative;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 10px 3px 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 78px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    animation: cardEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  }
+  
+  @keyframes cardEnter {
+    from { opacity: 0; transform: translateY(10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  .shortcut-card::before {
+    content: '';
+    position: absolute;
+    top: -1.5px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-light), var(--accent), var(--primary-light), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.8);
+  }
+  
+  .shortcut-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .shortcut-card:hover {
+    transform: translateY(-3px);
+    background: var(--surface-hover);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 
+      0 10px 24px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(99, 102, 241, 0.15),
+      0 0 16px rgba(99, 102, 241, 0.15);
+  }
+  
+  .shortcut-card:hover::before { opacity: 1; }
+  .shortcut-card:hover::after { opacity: 1; }
+  
+  .shortcut-card:active { transform: translateY(-1px) scale(0.97); }
+  
+  .shortcut-card.dragging {
+    opacity: 0.3;
+    transform: scale(0.9) rotate(3deg);
+  }
+  
+  .shortcut-card.drag-over {
+    border: 1.5px dashed var(--primary);
+    transform: scale(1.06);
+    background: rgba(99, 102, 241, 0.1);
+  }
+  
+  body.light-mode .shortcut-card {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  
+  body.light-mode .shortcut-card:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 
+      0 10px 24px rgba(99, 102, 241, 0.12),
+      0 0 0 1px rgba(99, 102, 241, 0.08);
+  }
+  
+  body.light-mode .shortcut-card::after {
+    background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+  }
+  
+  .shortcut-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    transition: var(--transition);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .shortcut-card:hover .shortcut-icon-wrap {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(34, 211, 238, 0.15));
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  
+  .shortcut-icon-wrap i {
+    font-size: 1.05em;
+    color: var(--text-primary);
+    transition: var(--transition);
+  }
+  
+  .shortcut-card:hover .shortcut-icon-wrap i { color: var(--primary-light); }
+  
+  .shortcut-icon-wrap img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+  
+  .shortcut-name {
+    font-size: 0.58em;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    padding: 0 1px;
+    line-height: 1.15;
+    box-sizing: border-box;
+  }
+  
+  .fav-indicator {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-size: 0.5em;
+    color: var(--warning);
+    opacity: 0;
+    transition: var(--transition);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    z-index: 2;
+  }
+  
+  .shortcut-card.is-fav .fav-indicator { opacity: 1; }
+  
+  .shortcut-card.is-fav {
+    border-color: rgba(251, 191, 36, 0.35);
+  }
+  
+  .shortcut-card.is-fav:hover {
+    border-color: rgba(251, 191, 36, 0.6);
+  }
+  
+  /* Menu Button */
+  .card-menu-btn {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.5em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    z-index: 3;
+    opacity: 0.5;
+  }
+  
+  .shortcut-card:hover .card-menu-btn {
+    opacity: 1;
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  
+  .card-menu-btn:active { transform: scale(0.9); }
+  
+  .card-menu-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    opacity: 1;
+  }
+  
+  /* ============================================
+     GLOBAL POPOVER
+     ============================================ */
+  .action-popover {
+    position: fixed;
+    background: rgba(15, 15, 30, 0.98);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 5px;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 9999;
+    min-width: 150px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    animation: popoverIn 0.15s ease-out;
+  }
+  
+  body.light-mode .action-popover { 
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  .action-popover.active { display: flex; }
+  
+  @keyframes popoverIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  .popover-item {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82em;
+    font-weight: 500;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    text-align: left;
+    width: 100%;
+  }
+  
+  .popover-item i {
+    width: 16px;
+    font-size: 0.95em;
+    color: var(--text-muted);
+    transition: var(--transition);
+    text-align: center;
+  }
+  
+  .popover-item:hover { background: var(--surface-hover); }
+  .popover-item:hover i { color: var(--primary-light); }
+  
+  .popover-item.danger:hover {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--danger);
+  }
+  
+  .popover-item.danger:hover i { color: var(--danger); }
+  
+  /* ============================================
+     ADD BUTTON
+     ============================================ */
+  .fab-row {
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 18px;
+  }
+  
+  .add-btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 12px 24px;
+    font-size: 0.85em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+  
+  .add-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+  }
+  
+  /* Empty state */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+  }
+  
+  .empty-state-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 14px;
+    border-radius: 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6em;
+    color: var(--primary-light);
+  }
+  
+  .empty-state-title {
+    font-size: 0.92em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+  
+  .empty-state-desc { font-size: 0.78em; color: var(--text-muted); }
+  
+  /* ============================================
+     MODAL
+     ============================================ */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  .modal.active { display: flex; }
+  
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .modal-content {
+    background: rgba(15, 15, 30, 0.92);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--border-strong);
+    border-radius: 22px;
+    padding: 24px;
+    width: 100%;
+    max-width: 460px;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  }
+  
+  body.light-mode .modal-content { background: rgba(255, 255, 255, 0.96); }
+  
+  @keyframes modalSlide {
+    from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+  
+  .modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .modal-title-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9em;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    flex-shrink: 0;
+  }
+  
+  .modal-title {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .modal-subtitle {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    flex-shrink: 0;
+  }
+  
+  .close-btn:hover {
+    background: var(--danger);
+    color: white;
+    transform: rotate(90deg);
+  }
+  
+  .form-group { margin-bottom: 14px; }
+  
+  .form-label {
+    display: block;
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  
+  .form-label .required { color: var(--danger); margin-left: 2px; }
+  
+  .form-control {
+    width: 100%;
+    padding: 11px 13px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    color: var(--text-primary);
+    font-size: 0.88em;
+    font-family: inherit;
+    transition: var(--transition);
+    outline: none;
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary);
+    background: var(--surface-hover);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+  
+  .form-control::placeholder { color: var(--text-muted); }
+  
+  .icon-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 11px 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+  }
+  
+  .icon-preview-visual {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(34, 211, 238, 0.15));
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15em;
+    color: var(--primary-light);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .icon-preview-visual img { width: 26px; height: 26px; }
+  
+  .icon-preview-label {
+    font-size: 0.68em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  
+  .icon-preview-value {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  
+  .icon-suggestions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+    max-height: 130px;
+    overflow-y: auto;
+    padding: 2px;
+  }
+  
+  .icon-suggestion {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .icon-suggestion i {
+    font-size: 1.05em;
+    color: var(--text-secondary);
+    transition: var(--transition);
+  }
+  
+  .icon-suggestion span {
+    font-size: 0.58em;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  
+  .icon-suggestion:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+  
+  .icon-suggestion:hover i { color: var(--primary-light); }
+  
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  
+  .toggle-row:hover { border-color: var(--border-strong); }
+  
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8em;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  
+  .toggle-label i { color: var(--primary-light); font-size: 0.95em; }
+  
+  .mini-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  
+  .mini-switch input { opacity: 0; width: 0; height: 0; }
+  
+  .mini-switch-track {
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 22px;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  
+  .mini-switch-track::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    top: 2px;
+    left: 2px;
+    transition: var(--transition);
+  }
+  
+  .mini-switch input:checked + .mini-switch-track {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  
+  .mini-switch input:checked + .mini-switch-track::before {
+    background: white;
+    transform: translateX(18px);
+  }
+  
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .cat-chip {
+    padding: 8px 13px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.74em;
+    font-weight: 500;
+    transition: var(--transition);
+    font-family: inherit;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .cat-chip:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+  
+  .cat-chip.selected {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+  
+  .modal-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  
+  .btn {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 11px;
+    font-size: 0.83em;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    flex: 1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
+  }
+  
+  .btn-secondary {
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    flex: 1;
+  }
+  
+  .btn-secondary:hover { background: var(--surface-hover); }
+  
+  .btn-danger {
+    background: linear-gradient(135deg, var(--danger), #be123c);
+    color: white;
+    flex: 1;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35);
+  }
+  
+  .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(244, 63, 94, 0.5);
+  }
+  
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  
+  .settings-row:last-child { border-bottom: none; }
+  
+  .settings-info { flex: 1; min-width: 0; }
+  
+  .settings-label {
+    font-size: 0.82em;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  
+  .settings-desc { font-size: 0.7em; color: var(--text-muted); }
+  
+  .settings-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 7px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: 500;
+    font-family: inherit;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  
+  .settings-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150px);
+    background: rgba(15, 15, 30, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 13px 17px;
+    border-radius: 14px;
+    font-size: 0.83em;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: calc(100vw - 32px);
+    min-width: 240px;
+  }
+  
+  body.light-mode .toast { background: rgba(255, 255, 255, 0.98); }
+  
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  
+  .toast-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+    font-size: 0.9em;
+  }
+  
+  .toast.error .toast-icon { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+  .toast.warning .toast-icon { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+  
+  .toast-content { flex: 1; min-width: 0; }
+  .toast-message { font-weight: 500; }
+  
+  .toast-action {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--primary-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    font-family: inherit;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+  
+  .toast-action:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  
+  /* ============================================
+     RESPONSIVE - All devices show 5 columns
+     ============================================ */
+  @media (max-width: 640px) {
+    body { padding: 8px; }
+    .header { padding: 12px 14px; border-radius: 16px; margin-bottom: 16px; }
+    #clock { font-size: 1.35em; }
+    #date { font-size: 0.66em; }
+    .icon-btn, .theme-toggle { width: 36px; height: 36px; }
+    .brand { margin-bottom: 16px; }
+    .brand-logo { width: 150px; }
+    .engine-tabs { padding: 3px; margin-bottom: 14px; }
+    .engine-tab { padding: 6px 11px; font-size: 0.7em; }
+    .engine-tab span { display: none; }
+    .engine-tab i { font-size: 1.05em; }
+    .search-input { padding: 14px 46px 14px 44px; font-size: 0.9em; }
+    .search-icon-left { left: 16px; font-size: 0.9em; }
+    .search-submit { width: 38px; font-size: 0.9em; }
+    .search-clear { right: 48px; }
+    .shortcuts-section { margin-top: 18px; }
+    .section-title { font-size: 0.85em; }
+    .section-title-icon { width: 28px; height: 28px; font-size: 0.75em; }
+    .cat-tab { padding: 6px 11px; font-size: 0.7em; }
+    .shortcut-card { padding: 9px 2px 7px; min-height: 74px; border-radius: 11px; }
+    .shortcut-icon-wrap { width: 32px; height: 32px; border-radius: 9px; margin-bottom: 5px; }
+    .shortcut-icon-wrap i { font-size: 0.95em; }
+    .shortcut-icon-wrap img { width: 20px; height: 20px; }
+    .shortcut-name { font-size: 0.54em; }
+    .card-menu-btn { width: 16px; height: 16px; font-size: 0.45em; top: 3px; right: 3px; }
+    .fav-indicator { font-size: 0.45em; top: 3px; left: 3px; }
+    .add-btn { padding: 10px 20px; font-size: 0.8em; }
+    .modal-content { padding: 20px; border-radius: 18px; }
+    .modal-title-icon { width: 34px; height: 34px; font-size: 0.82em; }
+    .modal-title { font-size: 0.95em; }
+    .icon-suggestions { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+  }
+  
+  @media (max-width: 400px) {
+    body { padding: 6px; }
+    .shortcuts-grid { gap: 4px; }
+    .shortcut-card { padding: 8px 2px 6px; min-height: 70px; border-radius: 10px; }
+    .shortcut-icon-wrap { width: 30px; height: 30px; border-radius: 8px; margin-bottom: 4px; }
+    .shortcut-icon-wrap i { font-size: 0.9em; }
+    .shortcut-icon-wrap img { width: 18px; height: 18px; }
+    .shortcut-name { font-size: 0.5em; }
+    .card-menu-btn { width: 15px; height: 15px; font-size: 0.42em; }
+    .fav-indicator { font-size: 0.42em; }
+    .header { padding: 10px 12px; }
+    #clock { font-size: 1.2em; }
+    #date { font-size: 0.62em; }
+    .brand-logo { width: 130px; }
+    .brand { margin-bottom: 14px; }
+  }
+  
+  @media (max-width: 340px) {
+    body { padding: 5px; }
+    .shortcuts-grid { gap: 3px; }
+    .shortcut-card { padding: 7px 1px 5px; min-height: 66px; border-radius: 9px; border-width: 1px; }
+    .shortcut-icon-wrap { width: 28px; height: 28px; border-radius: 7px; margin-bottom: 4px; }
+    .shortcut-icon-wrap i { font-size: 0.85em; }
+    .shortcut-icon-wrap img { width: 16px; height: 16px; }
+    .shortcut-name { font-size: 0.46em; }
+    .card-menu-btn { width: 14px; height: 14px; font-size: 0.38em; top: 2px; right: 2px; }
+    .fav-indicator { font-size: 0.38em; top: 2px; left: 2px; }
+  }
+  
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+  
+  ::selection { background: rgba(99, 102, 241, 0.35); color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <header class="header">
+    <div class="time-display">
+      <div id="clock">00:00:00</div>
+      <div id="date">Loading...</div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="menuBtn" title="সেটিংস">
+        <i class="fas fa-sliders-h"></i>
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="থিম পরিবর্তন">
+        <i class="fas fa-sun"></i>
+      </button>
+    </div>
+  </header>
+  
+  <section class="hero">
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
+        <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
+        <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C119.25 34.32 129.24 25 141.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
+        <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/>
+        <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
+        <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
+        <path d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z" fill="#4285F4"/>
+      </svg>
+    </div>
+    
+    <div class="engine-tabs" id="engineTabs">
+      <button class="engine-tab active" data-engine="google"><i class="fab fa-google"></i> <span>Google</span></button>
+      <button class="engine-tab" data-engine="youtube"><i class="fab fa-youtube"></i> <span>YouTube</span></button>
+      <button class="engine-tab" data-engine="bing"><i class="fab fa-microsoft"></i> <span>Bing</span></button>
+      <button class="engine-tab" data-engine="ddg"><i class="fas fa-shield-alt"></i> <span>DuckDuckGo</span></button>
+      <button class="engine-tab" data-engine="wikipedia"><i class="fab fa-wikipedia-w"></i> <span>Wikipedia</span></button>
+    </div>
+    
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon-left"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search Google or type a URL..." autocomplete="off" />
+      <button class="search-clear" id="searchClear" title="মুছুন"><i class="fas fa-times"></i></button>
+      <button class="search-submit" id="searchBtn" title="Search"><i class="fas fa-arrow-right"></i></button>
+    </div>
+  </section>
+  
+  <section class="shortcuts-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-title-icon"><i class="fas fa-bookmark"></i></div>
+        <span>বুকমার্ক</span>
+        <span class="section-count" id="shortcutCount">0</span>
+      </div>
+      <button class="fav-filter-btn" id="favFilterBtn">
+        <i class="fas fa-star"></i> ফেভারিট
+      </button>
+    </div>
+    
+    <div class="category-tabs" id="categoryTabs"></div>
+    <div class="shortcuts-grid" id="shortcutsGrid"></div>
+    
+    <div class="fab-row">
+      <button class="add-btn" id="addShortcutBtn">
+        <i class="fas fa-plus"></i>
+        <span>নতুন বুকমার্ক</span>
+      </button>
+    </div>
+  </section>
+  
+</div>
+
+<!-- Global Action Popover -->
+<div class="action-popover" id="globalPopover">
+  <button class="popover-item" data-action="fav"><i class="fas fa-star"></i><span>ফেভারিট</span></button>
+  <button class="popover-item" data-action="edit"><i class="fas fa-pen"></i><span>এডিট</span></button>
+  <button class="popover-item danger" data-action="delete"><i class="fas fa-trash"></i><span>ডিলিট</span></button>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal" id="addShortcutModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-title-icon" id="modalIcon"><i class="fas fa-plus"></i></div>
+        <div>
+          <h3 class="modal-title" id="modalTitle">নতুন বুকমার্ক</h3>
+          <div class="modal-subtitle">আপনার প্রিয় সাইট যোগ করুন</div>
+        </div>
+      </div>
+      <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">নাম <span class="required">*</span></label>
+      <input type="text" id="shortcutName" class="form-control" placeholder="যেমন: YouTube" maxlength="30" />
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">URL <span class="required">*</span></label>
+      <input type="text" id="shortcutUrl" class="form-control" placeholder="https://www.example.com" />
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <i class="fas fa-magic"></i>
+          <span>সাইটের অটো আইকন</span>
+        </div>
+        <label class="mini-switch">
+          <input type="checkbox" id="faviconToggle" checked>
+          <span class="mini-switch-track"></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">আইকন</label>
+      <input type="text" id="shortcutIcon" class="form-control" placeholder="fas fa-globe" />
+      <div class="icon-preview-box">
+        <div class="icon-preview-visual" id="iconPreviewWrap">
+          <i class="fas fa-globe" id="iconPreview"></i>
+          <img id="faviconPreview" style="display:none;" alt="">
+        </div>
+        <div class="icon-preview-info">
+          <div class="icon-preview-label">প্রিভিউ</div>
+          <div class="icon-preview-value" id="previewValue">fas fa-globe</div>
+        </div>
+      </div>
+      <div class="icon-suggestions">
+        <div class="icon-suggestion" data-icon="fas fa-globe"><i class="fas fa-globe"></i><span>Web</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-envelope"><i class="fas fa-envelope"></i><span>Mail</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-calendar"><i class="fas fa-calendar"></i><span>Calendar</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-robot"><i class="fas fa-robot"></i><span>AI</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-video"><i class="fas fa-video"></i><span>Video</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-music"><i class="fas fa-music"></i><span>Music</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-shopping-cart"><i class="fas fa-shopping-cart"></i><span>Shop</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-book"><i class="fas fa-book"></i><span>Book</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-gamepad"><i class="fas fa-gamepad"></i><span>Game</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-camera"><i class="fas fa-camera"></i><span>Photo</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-newspaper"><i class="fas fa-newspaper"></i><span>News</span></div>
+        <div class="icon-suggestion" data-icon="fas fa-code"><i class="fas fa-code"></i><span>Code</span></div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">ক্যাটাগরি</label>
+      <div class="category-chips" id="categoryChips"></div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancelShortcutBtn">বাতিল</button>
+      <button class="btn btn-primary" id="saveShortcutBtn"><i class="fas fa-check"></i> সেভ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal" id="menuModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-title-icon"><i class="fas fa-cog"></i></div>
+        <div>
+          <h3 class="modal-title">সেটিংস</h3>
+          <div class="modal-subtitle">ডেটা ম্যানেজমেন্ট</div>
+        </div>
+      </div>
+      <button class="close-btn" id="closeMenuBtn"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="settings-row">
+      <div class="settings-info">
+        <div class="settings-label">ডেটা এক্সপোর্ট</div>
+        <div class="settings-desc">JSON ব্যাকআপ ডাউনলোড</div>
+      </div>
+      <button class="settings-btn" id="exportBtn"><i class="fas fa-download"></i> এক্সপোর্ট</button>
+    </div>
+    
+    <div class="settings-row">
+      <div class="settings-info">
+        <div class="settings-label">ডেটা ইমপোর্ট</div>
+        <div class="settings-desc">ব্যাকআপ থেকে রিস্টোর</div>
+      </div>
+      <button class="settings-btn" id="importBtn"><i class="fas fa-upload"></i> ইমপোর্ট</button>
+    </div>
+    
+    <input type="file" id="importFile" accept=".json" style="display:none;">
+    
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="resetBtn"><i class="fas fa-trash-alt"></i> সব রিসেট</button>
+      <button class="btn btn-primary" id="closeMenuBtn2">ঠিক আছে</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal" id="confirmModal">
+  <div class="modal-content" style="max-width: 360px;">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-title-icon" style="background: linear-gradient(135deg, var(--danger), #be123c);">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div>
+          <h3 class="modal-title">নিশ্চিত করুন</h3>
+          <div class="modal-subtitle" id="confirmMessage">আপনি কি মুছে ফেলতে চান?</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top: 8px;">
+      <button class="btn btn-secondary" id="confirmCancel">বাতিল</button>
+      <button class="btn btn-danger" id="confirmOk">হ্যাঁ, মুছুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-icon"><i class="fas fa-check"></i></div>
+  <div class="toast-content"><div class="toast-message" id="toastMessage">সেভ হয়েছে</div></div>
+  <button class="toast-action" id="toastAction" style="display:none;">Undo</button>
+</div>
+
+<script>
+/* ============================================
+   STORAGE & STATE
+   ============================================ */
+const STORAGE = {
+  SHORTCUTS: 'dash_shortcuts_v8',
+  THEME: 'dash_theme_v8',
+  ENGINE: 'dash_engine_v8'
+};
+
+const state = {
+  shortcuts: [],
+  currentCategory: 'all',
+  currentEngine: 'google',
+  editingIndex: null,
+  selectedCategory: 'general',
+  favFilter: false,
+  popoverIndex: null
+};
+
+/* ============================================
+   DEFAULT SHORTCUTS - EMPTY
+   রিসেট করলে কোনো বুকমার্ক থাকবে না
+   ============================================ */
+const DEFAULT_SHORTCUTS = [];
+
+const CATEGORIES = {
+  all: { name: 'সব', icon: 'fas fa-th-large' },
+  general: { name: 'সাধারণ', icon: 'fas fa-globe' },
+  social: { name: 'সোশ্যাল', icon: 'fas fa-users' },
+  work: { name: 'কাজ', icon: 'fas fa-briefcase' },
+  media: { name: 'মিডিয়া', icon: 'fas fa-play-circle' },
+  tools: { name: 'টুলস', icon: 'fas fa-tools' }
+};
+
+const ENGINES = {
+  google: { url: 'https://www.google.com/search?q=', placeholder: 'Search Google or type a URL...' },
+  youtube: { url: 'https://www.youtube.com/results?search_query=', placeholder: 'Search YouTube...' },
+  bing: { url: 'https://www.bing.com/search?q=', placeholder: 'Search Bing...' },
+  ddg: { url: 'https://duckduckgo.com/?q=', placeholder: 'Search DuckDuckGo...' },
+  wikipedia: { url: 'https://bn.wikipedia.org/w/index.php?search=', placeholder: 'Search Wikipedia...' }
+};
+
+/* ============================================
+   HELPERS
+   ============================================ */
+const $ = id => document.getElementById(id);
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function getHostname(url) {
+  try { return new URL(url).hostname; } catch { return ''; }
+}
+
+function getFaviconUrl(url, size = 64) {
+  const host = getHostname(url);
+  if (!host) return '';
+  return `https://www.google.com/s2/favicons?domain=${host}&sz=${size}`;
+}
+
+function showToast(message, type = 'success', actionText = null, actionFn = null) {
+  const toast = $('toast');
+  $('toastMessage').textContent = message;
+  toast.className = 'toast ' + type;
+  
+  const icons = {
+    success: 'fas fa-check',
+    error: 'fas fa-times',
+    warning: 'fas fa-exclamation'
+  };
+  toast.querySelector('.toast-icon i').className = icons[type] || icons.success;
+  
+  const actionBtn = $('toastAction');
+  if (actionText && actionFn) {
+    actionBtn.textContent = actionText;
+    actionBtn.style.display = 'inline-flex';
+    actionBtn.onclick = () => {
+      actionFn();
+      toast.classList.remove('show');
+    };
+  } else {
+    actionBtn.style.display = 'none';
+  }
+  
+  requestAnimationFrame(() => toast.classList.add('show'));
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+/* ============================================
+   CLOCK
+   ============================================ */
+const DAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+const MONTHS_BN = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  $('clock').textContent = `${h}:${m}:${s}`;
+  
+  const day = DAYS_BN[now.getDay()];
+  const date = now.getDate();
+  const month = MONTHS_BN[now.getMonth()];
+  const year = now.getFullYear();
+  $('date').textContent = `${day}, ${date} ${month} ${year}`;
+}
+
+setInterval(updateTime, 1000);
+updateTime();
+
+/* ============================================
+   THEME
+   ============================================ */
+const themeToggle = $('themeToggle');
+
+function applyTheme(theme) {
+  document.body.classList.toggle('light-mode', theme === 'light');
+  const icon = themeToggle.querySelector('i');
+  icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+themeToggle.addEventListener('click', () => {
+  const isLight = document.body.classList.contains('light-mode');
+  const newTheme = isLight ? 'dark' : 'light';
+  applyTheme(newTheme);
+  localStorage.setItem(STORAGE.THEME, newTheme);
+});
+
+applyTheme(localStorage.getItem(STORAGE.THEME) || 'dark');
+
+/* ============================================
+   SEARCH
+   ============================================ */
+const searchInput = $('searchInput');
+
+function performSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+  
+  if (/^(https?:\/\/|www\.)/i.test(query)) {
+    const url = query.startsWith('http') ? query : 'https://' + query;
+    window.open(url, '_blank');
+    return;
+  }
+  
+  if (/^[\w-]+\.[\w.-]+$/.test(query)) {
+    window.open('https://' + query, '_blank');
+    return;
+  }
+  
+  window.open(ENGINES[state.currentEngine].url + encodeURIComponent(query), '_blank');
+}
+
+$('searchBtn').addEventListener('click', performSearch);
+searchInput.addEventListener('keypress', e => e.key === 'Enter' && performSearch());
+
+searchInput.addEventListener('input', () => {
+  $('searchClear').classList.toggle('visible', searchInput.value.length > 0);
+});
+
+$('searchClear').addEventListener('click', () => {
+  searchInput.value = '';
+  $('searchClear').classList.remove('visible');
+  searchInput.focus();
+});
+
+document.querySelectorAll('.engine-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.engine-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.currentEngine = tab.dataset.engine;
+    searchInput.placeholder = ENGINES[state.currentEngine].placeholder;
+    localStorage.setItem(STORAGE.ENGINE, state.currentEngine);
+  });
+});
+
+const savedEngine = localStorage.getItem(STORAGE.ENGINE);
+if (savedEngine && ENGINES[savedEngine]) {
+  state.currentEngine = savedEngine;
+  document.querySelectorAll('.engine-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.engine === savedEngine);
+  });
+  searchInput.placeholder = ENGINES[savedEngine].placeholder;
+}
+
+/* ============================================
+   GLOBAL ACTION POPOVER
+   ============================================ */
+const globalPopover = $('globalPopover');
+
+function openPopover(menuBtn, idx) {
+  state.popoverIndex = idx;
+  
+  const s = state.shortcuts[idx];
+  const favItem = globalPopover.querySelector('[data-action="fav"] span');
+  if (favItem) favItem.textContent = s.fav ? 'আনফেভারিট' : 'ফেভারিট';
+  
+  const rect = menuBtn.getBoundingClientRect();
+  globalPopover.classList.add('active');
+  
+  const popoverRect = globalPopover.getBoundingClientRect();
+  let top = rect.bottom + 6;
+  let left = rect.right - popoverRect.width;
+  
+  if (left < 8) left = 8;
+  if (left + popoverRect.width > window.innerWidth - 8) {
+    left = window.innerWidth - popoverRect.width - 8;
+  }
+  if (top + popoverRect.height > window.innerHeight - 8) {
+    top = rect.top - popoverRect.height - 6;
+    if (top < 8) top = 8;
+  }
+  
+  globalPopover.style.top = top + 'px';
+  globalPopover.style.left = left + 'px';
+  
+  document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
+  menuBtn.classList.add('active');
+}
+
+function closePopover() {
+  globalPopover.classList.remove('active');
+  state.popoverIndex = null;
+  document.querySelectorAll('.card-menu-btn.active').forEach(b => b.classList.remove('active'));
+}
+
+globalPopover.querySelectorAll('.popover-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const action = item.dataset.action;
+    const idx = state.popoverIndex;
+    if (idx === null) return;
+    
+    closePopover();
+    
+    if (action === 'edit') editShortcut(idx);
+    else if (action === 'delete') deleteShortcut(idx);
+    else if (action === 'fav') toggleFav(idx);
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if (globalPopover.classList.contains('active')) {
+    if (!e.target.closest('#globalPopover') && !e.target.closest('.card-menu-btn')) {
+      closePopover();
+    }
+  }
+});
+
+window.addEventListener('scroll', () => {
+  if (globalPopover.classList.contains('active')) closePopover();
+}, true);
+
+window.addEventListener('resize', () => {
+  if (globalPopover.classList.contains('active')) closePopover();
+});
+
+/* ============================================
+   SHORTCUTS
+   ============================================ */
+function loadShortcuts() {
+  try {
+    const stored = localStorage.getItem(STORAGE.SHORTCUTS);
+    state.shortcuts = stored ? JSON.parse(stored) : [...DEFAULT_SHORTCUTS];
+  } catch {
+    state.shortcuts = [...DEFAULT_SHORTCUTS];
+  }
+}
+
+function saveShortcuts() {
+  localStorage.setItem(STORAGE.SHORTCUTS, JSON.stringify(state.shortcuts));
+  renderCategoryTabs();
+  renderShortcuts();
+}
+
+function getFiltered() {
+  let list = state.currentCategory === 'all'
+    ? state.shortcuts
+    : state.shortcuts.filter(s => s.category === state.currentCategory);
+  if (state.favFilter) list = list.filter(s => s.fav);
+  return list;
+}
+
+function renderCategoryTabs() {
+  const wrap = $('categoryTabs');
+  wrap.innerHTML = '';
+  
+  Object.entries(CATEGORIES).forEach(([key, cat]) => {
+    const count = key === 'all'
+      ? state.shortcuts.length
+      : state.shortcuts.filter(s => s.category === key).length;
+    
+    if (key !== 'all' && count === 0) return;
+    
+    const tab = document.createElement('button');
+    tab.className = 'cat-tab' + (state.currentCategory === key ? ' active' : '');
+    tab.innerHTML = `<i class="${cat.icon}"></i> ${cat.name} <span class="count">${count}</span>`;
+    tab.addEventListener('click', () => {
+      state.currentCategory = key;
+      renderCategoryTabs();
+      renderShortcuts();
+    });
+    wrap.appendChild(tab);
+  });
+}
+
+function renderShortcuts() {
+  closePopover();
+  const grid = $('shortcutsGrid');
+  grid.innerHTML = '';
+  const filtered = getFiltered();
+  
+  $('shortcutCount').textContent = filtered.length;
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-bookmark"></i></div>
+        <div class="empty-state-title">কোন বুকমার্ক নেই</div>
+        <div class="empty-state-desc">নিচের বাটনে ক্লিক করে যোগ করুন</div>
+      </div>
+    `;
+    return;
+  }
+  
+  filtered.forEach((s, displayIdx) => {
+    const realIdx = state.shortcuts.indexOf(s);
+    grid.appendChild(createCard(s, realIdx, displayIdx));
+  });
+}
+
+function createCard(s, realIdx, displayIdx) {
+  const card = document.createElement('div');
+  card.className = 'shortcut-card' + (s.fav ? ' is-fav' : '');
+  card.draggable = true;
+  card.dataset.index = realIdx;
+  card.style.animationDelay = (displayIdx * 0.025) + 's';
+  
+  let iconHtml;
+  if (s.useFavicon !== false && s.url) {
+    iconHtml = `<img src="${getFaviconUrl(s.url)}" alt="" loading="lazy"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <i class="${s.icon || 'fas fa-globe'}" style="display:none;"></i>`;
+  } else {
+    iconHtml = `<i class="${s.icon || 'fas fa-globe'}"></i>`;
+  }
+  
+  card.innerHTML = `
+    ${s.fav ? '<i class="fas fa-star fav-indicator"></i>' : ''}
+    <button class="card-menu-btn" title="মেনু"><i class="fas fa-ellipsis-vertical"></i></button>
+    <div class="shortcut-icon-wrap">${iconHtml}</div>
+    <div class="shortcut-name" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</div>
+  `;
+  
+  const menuBtn = card.querySelector('.card-menu-btn');
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    if (menuBtn.classList.contains('active')) {
+      closePopover();
+      return;
+    }
+    
+    openPopover(menuBtn, realIdx);
+  });
+  
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.card-menu-btn')) return;
+    if (globalPopover.classList.contains('active')) {
+      closePopover();
+      return;
+    }
+    const shortcut = state.shortcuts[realIdx];
+    if (shortcut) window.open(shortcut.url, '_blank');
+  });
+  
+  card.addEventListener('dragstart', e => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', realIdx);
+    card.classList.add('dragging');
+  });
+  
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+    document.querySelectorAll('.shortcut-card').forEach(c => c.classList.remove('drag-over'));
+  });
+  
+  card.addEventListener('dragover', e => {
+    e.preventDefault();
+    card.classList.add('drag-over');
+  });
+  
+  card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+  
+  card.addEventListener('drop', e => {
+    e.preventDefault();
+    card.classList.remove('drag-over');
+    const from = parseInt(e.dataTransfer.getData('text/plain'));
+    if (from !== realIdx && !isNaN(from)) {
+      const [moved] = state.shortcuts.splice(from, 1);
+      state.shortcuts.splice(realIdx, 0, moved);
+      saveShortcuts();
+      showToast('পুনর্বিন্যাস হয়েছে');
+    }
+  });
+  
+  return card;
+}
+
+function toggleFav(idx) {
+  state.shortcuts[idx].fav = !state.shortcuts[idx].fav;
+  saveShortcuts();
+  showToast(state.shortcuts[idx].fav ? 'ফেভারিটে যোগ হয়েছে' : 'ফেভারিট থেকে সরানো হয়েছে');
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+function openModal(modal) {
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modal) {
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+/* ============================================
+   ADD/EDIT
+   ============================================ */
+function renderCategoryChips() {
+  const wrap = $('categoryChips');
+  wrap.innerHTML = '';
+  Object.entries(CATEGORIES).forEach(([key, cat]) => {
+    if (key === 'all') return;
+    const chip = document.createElement('button');
+    chip.className = 'cat-chip' + (state.selectedCategory === key ? ' selected' : '');
+    chip.dataset.cat = key;
+    chip.innerHTML = `<i class="${cat.icon}"></i> ${cat.name}`;
+    chip.addEventListener('click', () => {
+      state.selectedCategory = key;
+      renderCategoryChips();
+    });
+    wrap.appendChild(chip);
+  });
+}
+
+function updateIconPreview() {
+  const url = $('shortcutUrl').value.trim();
+  const useFav = $('faviconToggle').checked;
+  const icon = $('shortcutIcon').value.trim() || 'fas fa-globe';
+  
+  $('previewValue').textContent = useFav && url ? (getHostname(url) || 'auto') : icon;
+  
+  if (useFav && url) {
+    const fullUrl = url.startsWith('http') ? url : 'https://' + url;
+    $('faviconPreview').src = getFaviconUrl(fullUrl);
+    $('faviconPreview').style.display = 'block';
+    $('iconPreview').style.display = 'none';
+  } else {
+    $('iconPreview').className = icon;
+    $('iconPreview').style.display = 'block';
+    $('faviconPreview').style.display = 'none';
+  }
+}
+
+function openAddModal() {
+  state.editingIndex = null;
+  state.selectedCategory = 'general';
+  $('modalTitle').textContent = 'নতুন বুকমার্ক';
+  $('modalIcon').innerHTML = '<i class="fas fa-plus"></i>';
+  $('shortcutName').value = '';
+  $('shortcutUrl').value = '';
+  $('shortcutIcon').value = 'fas fa-globe';
+  $('faviconToggle').checked = true;
+  renderCategoryChips();
+  updateIconPreview();
+  openModal($('addShortcutModal'));
+  setTimeout(() => $('shortcutName').focus(), 200);
+}
+
+function editShortcut(idx) {
+  const s = state.shortcuts[idx];
+  state.editingIndex = idx;
+  state.selectedCategory = s.category || 'general';
+  $('modalTitle').textContent = 'বুকমার্ক এডিট';
+  $('modalIcon').innerHTML = '<i class="fas fa-pen"></i>';
+  $('shortcutName').value = s.name;
+  $('shortcutUrl').value = s.url;
+  $('shortcutIcon').value = s.icon || 'fas fa-globe';
+  $('faviconToggle').checked = s.useFavicon !== false;
+  renderCategoryChips();
+  updateIconPreview();
+  openModal($('addShortcutModal'));
+}
+
+function deleteShortcut(idx) {
+  const s = state.shortcuts[idx];
+  $('confirmMessage').textContent = `"${s.name}" মুছে ফেলতে চান?`;
+  openModal($('confirmModal'));
+  
+  $('confirmOk').onclick = () => {
+    const backup = { ...s, _idx: idx };
+    state.shortcuts.splice(idx, 1);
+    saveShortcuts();
+    closeModal($('confirmModal'));
+    showToast(`"${s.name}" মুছে ফেলা হয়েছে`, 'warning', 'Undo', () => {
+      state.shortcuts.splice(backup._idx, 0, backup);
+      delete backup._idx;
+      saveShortcuts();
+      showToast('পুনরুদ্ধার হয়েছে');
+    });
+  };
+  
+  $('confirmCancel').onclick = () => closeModal($('confirmModal'));
+}
+
+function saveShortcut() {
+  const name = $('shortcutName').value.trim();
+  let url = $('shortcutUrl').value.trim();
+  const icon = $('shortcutIcon').value.trim() || 'fas fa-globe';
+  const useFavicon = $('faviconToggle').checked;
+  
+  if (!name || !url) {
+    showToast('নাম এবং URL দিন', 'error');
+    return;
+  }
+  
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  
+  const data = {
+    name, url, icon, useFavicon,
+    category: state.selectedCategory,
+    fav: state.editingIndex !== null ? state.shortcuts[state.editingIndex].fav : false
+  };
+  
+  if (state.editingIndex !== null) {
+    state.shortcuts[state.editingIndex] = { ...state.shortcuts[state.editingIndex], ...data };
+    showToast('আপডেট হয়েছে');
+  } else {
+    state.shortcuts.push(data);
+    showToast('যোগ হয়েছে');
+  }
+  
+  saveShortcuts();
+  closeModal($('addShortcutModal'));
+}
+
+/* ============================================
+   EVENT LISTENERS
+   ============================================ */
+$('addShortcutBtn').addEventListener('click', openAddModal);
+$('closeModalBtn').addEventListener('click', () => closeModal($('addShortcutModal')));
+$('cancelShortcutBtn').addEventListener('click', () => closeModal($('addShortcutModal')));
+$('saveShortcutBtn').addEventListener('click', saveShortcut);
+
+$('shortcutIcon').addEventListener('input', updateIconPreview);
+$('shortcutUrl').addEventListener('input', updateIconPreview);
+$('faviconToggle').addEventListener('change', updateIconPreview);
+
+document.querySelectorAll('.icon-suggestion').forEach(s => {
+  s.addEventListener('click', () => {
+    $('shortcutIcon').value = s.dataset.icon;
+    $('faviconToggle').checked = false;
+    updateIconPreview();
+  });
+});
+
+$('addShortcutModal').addEventListener('click', e => {
+  if (e.target === $('addShortcutModal')) closeModal($('addShortcutModal'));
+});
+
+$('menuBtn').addEventListener('click', () => openModal($('menuModal')));
+$('closeMenuBtn').addEventListener('click', () => closeModal($('menuModal')));
+$('closeMenuBtn2').addEventListener('click', () => closeModal($('menuModal')));
+$('menuModal').addEventListener('click', e => {
+  if (e.target === $('menuModal')) closeModal($('menuModal'));
+});
+
+$('favFilterBtn').addEventListener('click', () => {
+  state.favFilter = !state.favFilter;
+  $('favFilterBtn').classList.toggle('active', state.favFilter);
+  renderShortcuts();
+});
+
+/* ============================================
+   IMPORT / EXPORT / RESET
+   ============================================ */
+$('exportBtn').addEventListener('click', () => {
+  const data = {
+    shortcuts: state.shortcuts,
+    theme: localStorage.getItem(STORAGE.THEME),
+    engine: localStorage.getItem(STORAGE.ENGINE),
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Bookmark-Backup-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('এক্সপোর্ট সফল');
+});
+
+$('importBtn').addEventListener('click', () => $('importFile').click());
+
+$('importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.shortcuts && Array.isArray(data.shortcuts)) {
+        state.shortcuts = data.shortcuts;
+        saveShortcuts();
+      }
+      if (data.theme) { applyTheme(data.theme); localStorage.setItem(STORAGE.THEME, data.theme); }
+      showToast('ইমপোর্ট সফল');
+      closeModal($('menuModal'));
+    } catch {
+      showToast('ফাইল পড়া যায়নি', 'error');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+$('resetBtn').addEventListener('click', () => {
+  $('confirmMessage').textContent = 'সব ডেটা মুছে ডিফল্টে ফিরবে। নিশ্চিত?';
+  openModal($('confirmModal'));
+  $('confirmOk').onclick = () => {
+    Object.values(STORAGE).forEach(k => localStorage.removeItem(k));
+    state.shortcuts = []; // সম্পূর্ণ খালি
+    state.favFilter = false;
+    $('favFilterBtn').classList.remove('active');
+    applyTheme('dark');
+    saveShortcuts();
+    closeModal($('confirmModal'));
+    closeModal($('menuModal'));
+    showToast('রিসেট সম্পন্ন - সব বুকমার্ক মুছে গেছে');
+  };
+  $('confirmCancel').onclick = () => closeModal($('confirmModal'));
+});
+
+/* ============================================
+   INIT
+   ============================================ */
+loadShortcuts();
+renderCategoryTabs();
+renderShortcuts();
+</script>
+
+</body>
+</html>
